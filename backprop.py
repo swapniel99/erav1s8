@@ -118,9 +118,9 @@ class Test(object):
         return test_loss
 
     def show_incorrect(self, denorm=True):
-        _ = plt.figure()
+        _ = plt.figure(figsize=(10, 3))
         for i in range(10):
-            plt.subplot(5, 2, i + 1)
+            plt.subplot(2, 5, i + 1)
             plt.tight_layout()
             image = self.test_incorrect_pred["images"][i].cpu()
             if denorm:
