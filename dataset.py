@@ -43,14 +43,17 @@ class CIFAR10(object):
             t.mul_(s).add_(m)
         return tensor
 
-    def show_examples(self, figsize=None):
+    def show_examples(self, figsize=None, denorm=True):
         batch_data, batch_label = next(iter(self.train_loader))
 
         _ = plt.figure(figsize=figsize)
         for i in range(12):
             plt.subplot(3, 4, i + 1)
             plt.tight_layout()
-            plt.imshow(self.denormalise(batch_data[i]).permute(1, 2, 0))
+            image = batch_data[i]
+            if denorm:
+                image = self.denormalise(image)
+            plt.imshow(image.permute(1, 2, 0))
             label = batch_label[i].item()
             if self.classes is not None:
                 label = str(label) + ':' + self.classes[label]

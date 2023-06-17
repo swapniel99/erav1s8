@@ -65,11 +65,11 @@ class Train(object):
         self.train_losses.append(train_loss / processed)
 
     def plot_stats(self):
-        fig, axs = plt.subplots(1, 2, figsize=(8, 10))
-        axs[0, 0].plot(self.train_losses)
-        axs[0, 0].set_title("Training Loss")
-        axs[0, 1].plot(self.train_acc)
-        axs[0, 1].set_title("Training Accuracy")
+        fig, axs = plt.subplots(1, 2, figsize=(15, 5))
+        axs[0].plot(self.train_losses)
+        axs[0].set_title("Training Loss")
+        axs[1].plot(self.train_acc)
+        axs[1].set_title("Training Accuracy")
 
 
 class Test(object):
@@ -117,12 +117,15 @@ class Test(object):
 
         return test_loss
 
-    def show_incorrect(self):
+    def show_incorrect(self, denorm=True):
         _ = plt.figure()
         for i in range(10):
             plt.subplot(5, 2, i + 1)
             plt.tight_layout()
-            plt.imshow(self.dataset.denormalise(self.test_incorrect_pred["images"][i].cpu()).permute(1, 2, 0))
+            image = self.test_incorrect_pred["images"][i].cpu()
+            if denorm:
+                image = self.dataset.denormalise(image)
+            plt.imshow(image.permute(1, 2, 0))
             pred = self.test_incorrect_pred["predicted_vals"][i]
             truth = self.test_incorrect_pred["ground_truths"][i]
             if self.dataset.classes is not None:
@@ -133,8 +136,8 @@ class Test(object):
             plt.yticks([])
 
     def plot_stats(self):
-        fig, axs = plt.subplots(1, 2, figsize=(8, 10))
-        axs[0, 0].plot(self.test_losses)
-        axs[0, 0].set_title("Test Loss")
-        axs[0, 1].plot(self.test_acc)
-        axs[0, 1].set_title("Test Accuracy")
+        fig, axs = plt.subplots(1, 2, figsize=(15, 5))
+        axs[0].plot(self.test_losses)
+        axs[0].set_title("Test Loss")
+        axs[1].plot(self.test_acc)
+        axs[1].set_title("Test Accuracy")
