@@ -14,29 +14,26 @@ class Model(nn.Module):
             nn.ReLU()
         )
 
-        self.tblock1 = self.get_trans_layer(16, 16, norm_type, n_groups)
-
-        self.cblock2 = self.get_conv_layer(16, 24, norm_type, n_groups)
-
-        self.tblock2 = self.get_trans_layer(24, 24, norm_type, n_groups)
-
-        self.cblock3 = self.get_conv_layer(24, 32, norm_type, n_groups)
+        self.tblock1 = self.get_trans_block(16, 16)
+        self.cblock2 = self.get_conv_block(16, 24, norm_type, n_groups)
+        self.tblock2 = self.get_trans_block(24, 24)
+        self.cblock3 = self.get_conv_block(24, 32, norm_type, n_groups)
 
         self.oblock = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
-            nn.Flatten(),
             nn.Conv2d(32, 10, 1),
+            nn.Flatten(),
             nn.LogSoftmax(-1)
         )
 
     @classmethod
-    def get_conv_layer(cls, input_c, output_c, norm_type, n_groups, reps=3):
+    def get_conv_block(cls, input_c, output_c, norm_type, n_groups, reps=3):
         block = [
             nn.Conv2d(input_c, output_c, 3, padding=1, bias=False, padding_mode='replicate'),
             cls.get_norm_layer(norm_type, output_c, n_groups),
             nn.ReLU()
         ]
-        for i in range(reps - 1):
+        for i in range(1, reps):
             block += [
                 nn.Conv2d(output_c, output_c, 3, padding=1, bias=False, padding_mode='replicate'),
                 cls.get_norm_layer(norm_type, output_c, n_groups),
@@ -45,7 +42,7 @@ class Model(nn.Module):
         return nn.Sequential(*block)
 
     @classmethod
-    def get_trans_layer(cls, input_c, output_c, norm_type, n_groups):
+    def get_trans_block(cls, input_c, output_c):
         return nn.Sequential(
             nn.Conv2d(input_c, output_c, 1, bias=False),
             nn.MaxPool2d(2, 2)
