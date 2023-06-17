@@ -2,7 +2,7 @@ import torch
 from tqdm import tqdm
 from matplotlib import pyplot as plt
 
-from dataset import CIFAR10
+from utils import get_device
 
 
 def get_correct_count(prediction, labels):
@@ -16,11 +16,11 @@ def get_incorrect_preds(prediction, labels):
 
 
 class Train(object):
-    def __init__(self, model, device, criterion, train_loader, optimizer, l1=0):
+    def __init__(self, model, dataset, criterion, optimizer, l1=0):
         self.model = model
-        self.device = device
+        self.device = get_device()
         self.criterion = criterion
-        self.train_loader = train_loader
+        self.dataset = dataset
         self.optimizer = optimizer
         self.l1 = l1
 
@@ -29,7 +29,7 @@ class Train(object):
 
     def run(self):
         self.model.train()
-        pbar = tqdm(self.train_loader)
+        pbar = tqdm(self.dataset.train_loader)
 
         train_loss = 0
         correct = 0
@@ -73,11 +73,11 @@ class Train(object):
 
 
 class Test(object):
-    def __init__(self, model, device, criterion, test_loader):
+    def __init__(self, model, dataset, criterion):
         self.model = model
-        self.device = device
+        self.device = get_device()
         self.criterion = criterion
-        self.test_loader = test_loader
+        self.dataset = dataset
 
         self.test_losses = list()
         self.test_acc = list()
@@ -95,7 +95,7 @@ class Test(object):
         processed = 0
 
         with torch.no_grad():
-            for batch_idx, (data, target) in enumerate(self.test_loader):
+            for batch_idx, (data, target) in enumerate(self.dataset.test_loader):
                 data, target = data.to(self.device), target.to(self.device)
                 pred = self.model(data)
 
@@ -122,12 +122,12 @@ class Test(object):
         for i in range(10):
             plt.subplot(5, 2, i + 1)
             plt.tight_layout()
-            plt.imshow(CIFAR10.denormalise(self.test_incorrect_pred["images"][i].cpu()).permute(1, 2, 0))
+            plt.imshow(self.dataset.denormalise(self.test_incorrect_pred["images"][i].cpu()).permute(1, 2, 0))
             pred = self.test_incorrect_pred["predicted_vals"][i]
             truth = self.test_incorrect_pred["ground_truths"][i]
-            if CIFAR10.classes is not None:
-                pred = str(pred) + ':' + CIFAR10.classes[pred]
-                truth = str(truth) + ':' + CIFAR10.classes[truth]
+            if self.dataset.classes is not None:
+                pred = str(pred) + ':' + self.dataset.classes[pred]
+                truth = str(truth) + ':' + self.dataset.classes[truth]
             plt.title(pred + "/" + truth)
             plt.xticks([])
             plt.yticks([])
