@@ -49,15 +49,15 @@ class Model(nn.Module):
         )
 
     @staticmethod
-    def get_norm_layer(norm_type, x, n_groups):
+    def get_norm_layer(norm_type, c, n_groups):
         if norm_type == 'batch':
-            return nn.BatchNorm2d(x)
+            return nn.BatchNorm2d(c)
         elif norm_type == 'layer':
-            return nn.GroupNorm(1, x)
+            return nn.GroupNorm(1, c)
         elif norm_type == 'group':
-            return nn.GroupNorm(n_groups, x)
+            return nn.GroupNorm(n_groups, c)
         elif norm_type == 'instance':
-            return nn.GroupNorm(x, x)
+            return nn.GroupNorm(c, c)
 
     def forward(self, x):
         x = self.cblock1(x)
