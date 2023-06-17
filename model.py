@@ -56,6 +56,8 @@ class Model(nn.Module):
             return nn.GroupNorm(1, x)
         elif norm_type == 'group':
             return nn.GroupNorm(n_groups, x)
+        elif norm_type == 'instance':
+            return nn.GroupNorm(x, x)
 
     def forward(self, x):
         x = self.cblock1(x)
