@@ -27,7 +27,7 @@ class Train(object):
         self.train_losses = list()
         self.train_acc = list()
 
-    def run(self):
+    def __call__(self):
         self.model.train()
         pbar = tqdm(self.dataset.train_loader)
 
@@ -87,7 +87,7 @@ class Test(object):
             "predicted_vals": list()
         }
 
-    def run(self):
+    def __call__(self):
         self.model.eval()
 
         test_loss = 0
@@ -117,6 +117,13 @@ class Test(object):
 
         return test_loss
 
+    def plot_stats(self):
+        fig, axs = plt.subplots(1, 2, figsize=(15, 5))
+        axs[0].plot(self.test_losses)
+        axs[0].set_title("Test Loss")
+        axs[1].plot(self.test_acc)
+        axs[1].set_title("Test Accuracy")
+
     def show_incorrect(self, denorm=True):
         _ = plt.figure(figsize=(10, 3))
         for i in range(10):
@@ -134,10 +141,3 @@ class Test(object):
             plt.title(pred + "/" + truth)
             plt.xticks([])
             plt.yticks([])
-
-    def plot_stats(self):
-        fig, axs = plt.subplots(1, 2, figsize=(15, 5))
-        axs[0].plot(self.test_losses)
-        axs[0].set_title("Test Loss")
-        axs[1].plot(self.test_acc)
-        axs[1].set_title("Test Accuracy")
