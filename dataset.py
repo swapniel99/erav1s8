@@ -1,3 +1,4 @@
+import os
 import torch
 from torchvision import datasets, transforms
 from matplotlib import pyplot as plt
@@ -10,7 +11,7 @@ class CIFAR10(object):
 
     def __init__(self, batch_size=32):
         self.batch_size = batch_size
-        self.loader_kwargs = {'batch_size': batch_size, 'num_workers': 4, 'pin_memory': True}
+        self.loader_kwargs = {'batch_size': batch_size, 'num_workers': os.cpu_count(), 'pin_memory': True}
         self.train_loader, self.test_loader = self.get_loaders()
 
     def get_train_loader(self):
