@@ -1,24 +1,25 @@
 import torch
 
 SEED = 42
+DEVICE = None
 
 
 def get_device():
+    global DEVICE
+    if DEVICE is not None:
+        return DEVICE
+
     if torch.cuda.is_available():
-        device = "cuda"
+        DEVICE = "cuda"
     elif torch.backends.mps.is_available():
-        device = "mps"
+        DEVICE = "mps"
     else:
-        device = "cpu"
-    print("Device Selected:", device)
+        DEVICE = "cpu"
+    print("Device Selected:", DEVICE)
+    return DEVICE
 
-    return device
 
-
-def set_seed(device=None, seed=SEED):
-    if device is None:
-        device = get_device()
-
+def set_seed(seed=SEED):
     torch.manual_seed(seed)
-    if device == 'cuda':
+    if get_device() == 'cuda':
         torch.cuda.manual_seed(seed)

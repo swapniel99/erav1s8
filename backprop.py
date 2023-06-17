@@ -2,6 +2,8 @@ import torch
 from tqdm import tqdm
 from matplotlib import pyplot as plt
 
+from dataset import CIFAR10
+
 
 def get_correct_count(prediction, labels):
     return prediction.argmax(dim=1).eq(labels).sum().item()
@@ -115,17 +117,17 @@ class Test(object):
 
         return test_loss
 
-    def show_incorrect(self, dataset):
+    def show_incorrect(self):
         _ = plt.figure()
         for i in range(10):
             plt.subplot(5, 2, i + 1)
             plt.tight_layout()
-            plt.imshow(dataset.denormalise(self.test_incorrect_pred["images"][i].cpu()).permute(1, 2, 0))
+            plt.imshow(CIFAR10.denormalise(self.test_incorrect_pred["images"][i].cpu()).permute(1, 2, 0))
             pred = self.test_incorrect_pred["predicted_vals"][i]
             truth = self.test_incorrect_pred["ground_truths"][i]
-            if dataset.classes is not None:
-                pred = str(pred) + ':' + dataset.classes[pred]
-                truth = str(truth) + ':' + dataset.classes[truth]
+            if CIFAR10.classes is not None:
+                pred = str(pred) + ':' + CIFAR10.classes[pred]
+                truth = str(truth) + ':' + CIFAR10.classes[truth]
             plt.title(pred + "/" + truth)
             plt.xticks([])
             plt.yticks([])
