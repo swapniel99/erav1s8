@@ -10,15 +10,7 @@ class Model(nn.Module):
         self.norm_type = norm_type
         self.n_groups = n_groups
 
-        self.cblock1 = nn.Sequential(
-            nn.Conv2d(3, 16, 3, bias=False),
-            self.get_norm_layer(16),
-            nn.ReLU(),
-            nn.Conv2d(16, 16, 3, bias=False),
-            self.get_norm_layer(16),
-            nn.ReLU()
-        )
-
+        self.cblock1 = self.get_conv_block(3, 16, padding=0, reps=2)
         self.tblock1 = self.get_trans_block(16, 16)
         self.cblock2 = self.get_conv_block(16, 24)
         self.tblock2 = self.get_trans_block(24, 24)
@@ -31,15 +23,15 @@ class Model(nn.Module):
             nn.LogSoftmax(-1)
         )
 
-    def get_conv_block(self, input_c, output_c, reps=3):
+    def get_conv_block(self, input_c, output_c, padding=1, bias=False, reps=3, padding_mode='replicate'):
         block = [
-            nn.Conv2d(input_c, output_c, 3, padding=1, bias=False, padding_mode='replicate'),
+            nn.Conv2d(input_c, output_c, 3, padding=padding, bias=bias, padding_mode=padding_mode),
             self.get_norm_layer(output_c),
             nn.ReLU()
         ]
         for i in range(1, reps):
             block += [
-                nn.Conv2d(output_c, output_c, 3, padding=1, bias=False, padding_mode='replicate'),
+                nn.Conv2d(output_c, output_c, 3, padding=padding, bias=bias, padding_mode=padding_mode),
                 self.get_norm_layer(output_c),
                 nn.ReLU()
             ]
