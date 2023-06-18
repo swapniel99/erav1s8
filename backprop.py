@@ -83,13 +83,8 @@ class Test(object):
 
         self.test_losses = list()
         self.test_acc = list()
-        self.test_incorrect_pred = {
-            "images": list(),
-            "ground_truths": list(),
-            "predicted_vals": list()
-        }
 
-    def __call__(self):
+    def __call__(self, incorrect_preds=None):
         self.model.eval()
 
         test_loss = 0
@@ -106,10 +101,11 @@ class Test(object):
                 correct += get_correct_count(pred, target)
                 processed += len(data)
 
-                ind, pred, truth = get_incorrect_preds(pred, target)
-                self.test_incorrect_pred["images"] += data[ind]
-                self.test_incorrect_pred["ground_truths"] += truth
-                self.test_incorrect_pred["predicted_vals"] += pred
+                if incorrect_preds is not None:
+                    ind, pred, truth = get_incorrect_preds(pred, target)
+                    incorrect_preds["images"] += data[ind]
+                    incorrect_preds["ground_truths"] += truth
+                    incorrect_preds["predicted_vals"] += pred
 
         test_loss /= processed
         self.test_acc.append(100 * correct / processed)
@@ -126,24 +122,6 @@ class Test(object):
         axs[1].plot(self.test_acc)
         axs[1].set_title("Test Accuracy")
 
-    def show_incorrect(self, denorm=True):
-        _ = plt.figure(figsize=(10, 3))
-        for i in range(10):
-            plt.subplot(2, 5, i + 1)
-            plt.tight_layout()
-            image = self.test_incorrect_pred["images"][i].cpu()
-            if denorm:
-                image = self.dataset.denormalise(image)
-            plt.imshow(self.dataset.show_transform(image), cmap='gray')
-            pred = self.test_incorrect_pred["predicted_vals"][i]
-            truth = self.test_incorrect_pred["ground_truths"][i]
-            if self.dataset.classes is not None:
-                pred = f'{pred}:{self.dataset.classes[pred]}'
-                truth = f'{truth}:{self.dataset.classes[truth]}'
-            plt.title(f'{pred}/{truth}')
-            plt.xticks([])
-            plt.yticks([])
-
 
 class Experiment(object):
     def __init__(self, model, dataset, lr=0.01, criterion=F.nll_loss):
@@ -153,6 +131,7 @@ class Experiment(object):
         self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, patience=0, verbose=True, factor=0.3)
         self.train = Train(self.model, dataset, criterion, self.optimizer)
         self.test = Test(self.model, dataset, criterion)
+        self.incorrect_preds = None
 
     def execute(self, num_epochs=20):
         for epoch in range(1, num_epochs + 1):
@@ -160,3 +139,28 @@ class Experiment(object):
             self.train()
             test_loss = self.test()
             self.scheduler.step(test_loss)
+
+    def show_incorrect(self, denorm=True):
+        self.incorrect_preds = {
+            "images": list(),
+            "ground_truths": list(),
+            "predicted_vals": list()
+        }
+        self.test(self.incorrect_preds)
+
+        _ = plt.figure(figsize=(10, 3))
+        for i in range(10):
+            plt.subplot(2, 5, i + 1)
+            plt.tight_layout()
+            image = self.incorrect_preds["images"][i].cpu()
+            if denorm:
+                image = self.dataset.denormalise(image)
+            plt.imshow(self.dataset.show_transform(image), cmap='gray')
+            pred = self.incorrect_preds["predicted_vals"][i]
+            truth = self.incorrect_preds["ground_truths"][i]
+            if self.dataset.classes is not None:
+                pred = f'{pred}:{self.dataset.classes[pred]}'
+                truth = f'{truth}:{self.dataset.classes[truth]}'
+            plt.title(f'{pred}/{truth}')
+            plt.xticks([])
+            plt.yticks([])
