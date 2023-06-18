@@ -47,7 +47,7 @@ class DataSet(object):
             plt.imshow(self.show_transform(image), cmap='gray')
             label = batch_label[i].item()
             if self.classes is not None:
-                label = str(label) + ':' + self.classes[label]
-            plt.title(label)
+                label = f'{label}:{self.classes[label]}'
+            plt.title(str(label))
             plt.xticks([])
             plt.yticks([])
