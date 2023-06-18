@@ -5,19 +5,24 @@ import torchinfo
 class Model(nn.Module):
     def __init__(self, norm_type='batch', n_groups=4):
         super(Model, self).__init__()
+
+        # Member Variables
+        self.norm_type = norm_type
+        self.n_groups = n_groups
+
         self.cblock1 = nn.Sequential(
             nn.Conv2d(3, 16, 3, bias=False),
-            self.get_norm_layer(norm_type, 16, n_groups),
+            self.get_norm_layer(16),
             nn.ReLU(),
             nn.Conv2d(16, 16, 3, bias=False),
-            self.get_norm_layer(norm_type, 16, n_groups),
+            self.get_norm_layer(16),
             nn.ReLU()
         )
 
         self.tblock1 = self.get_trans_block(16, 16)
-        self.cblock2 = self.get_conv_block(16, 24, norm_type, n_groups)
+        self.cblock2 = self.get_conv_block(16, 24)
         self.tblock2 = self.get_trans_block(24, 24)
-        self.cblock3 = self.get_conv_block(24, 32, norm_type, n_groups)
+        self.cblock3 = self.get_conv_block(24, 32)
 
         self.oblock = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
@@ -26,37 +31,35 @@ class Model(nn.Module):
             nn.LogSoftmax(-1)
         )
 
-    @classmethod
-    def get_conv_block(cls, input_c, output_c, norm_type, n_groups, reps=3):
+    def get_conv_block(self, input_c, output_c, reps=3):
         block = [
             nn.Conv2d(input_c, output_c, 3, padding=1, bias=False, padding_mode='replicate'),
-            cls.get_norm_layer(norm_type, output_c, n_groups),
+            self.get_norm_layer(output_c),
             nn.ReLU()
         ]
         for i in range(1, reps):
             block += [
                 nn.Conv2d(output_c, output_c, 3, padding=1, bias=False, padding_mode='replicate'),
-                cls.get_norm_layer(norm_type, output_c, n_groups),
+                self.get_norm_layer(output_c),
                 nn.ReLU()
             ]
         return nn.Sequential(*block)
 
-    @classmethod
-    def get_trans_block(cls, input_c, output_c):
+    @staticmethod
+    def get_trans_block(input_c, output_c):
         return nn.Sequential(
             nn.Conv2d(input_c, output_c, 1, bias=False),
             nn.MaxPool2d(2, 2)
         )
 
-    @staticmethod
-    def get_norm_layer(norm_type, c, n_groups):
-        if norm_type == 'batch':
+    def get_norm_layer(self, c):
+        if self.norm_type == 'batch':
             return nn.BatchNorm2d(c)
-        elif norm_type == 'layer':
+        elif self.norm_type == 'layer':
             return nn.GroupNorm(1, c)
-        elif norm_type == 'group':
-            return nn.GroupNorm(n_groups, c)
-        elif norm_type == 'instance':
+        elif self.norm_type == 'group':
+            return nn.GroupNorm(self.n_groups, c)
+        elif self.norm_type == 'instance':
             return nn.GroupNorm(c, c)
 
     def forward(self, x):
