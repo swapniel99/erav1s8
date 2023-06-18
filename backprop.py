@@ -3,6 +3,7 @@ from torch import optim
 from torch.nn import functional as F
 from tqdm import tqdm
 from matplotlib import pyplot as plt
+from collections import defaultdict
 
 from utils import get_device
 
@@ -141,11 +142,7 @@ class Experiment(object):
             self.scheduler.step(test_loss)
 
     def show_incorrect(self, denorm=True):
-        self.incorrect_preds = {
-            "images": list(),
-            "ground_truths": list(),
-            "predicted_vals": list()
-        }
+        self.incorrect_preds = defaultdict(list)
         self.test(self.incorrect_preds)
 
         _ = plt.figure(figsize=(10, 3))
