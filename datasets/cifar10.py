@@ -13,7 +13,7 @@ class CIFAR10(DataSet):
         train_transforms = transforms.Compose([
             transforms.RandomHorizontalFlip(0.5),
             transforms.RandomGrayscale(0.1),
-            transforms.RandomRotation((-15.0, 15.0)),
+            transforms.RandomRotation((-7.0, 7.0)),
             transforms.RandomPerspective(0.3, 0.5),
             transforms.ToTensor(),
             transforms.Normalize(self.mean, self.std)
