@@ -150,7 +150,7 @@ class Experiment(object):
         self.model = model.to(get_device())
         self.dataset = dataset
         self.optimizer = optim.SGD(self.model.parameters(), lr=lr, momentum=0.9)
-        self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, patience=0, verbose=True, factor=0.5)
+        self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, patience=0, verbose=True, factor=0.3)
         self.train = Train(self.model, dataset, criterion, self.optimizer)
         self.test = Test(self.model, dataset, criterion)
 
