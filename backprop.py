@@ -135,12 +135,12 @@ class Test(object):
             if denorm:
                 image = self.dataset.denormalise(image)
             plt.imshow(self.dataset.show_transform(image), cmap='gray')
-            pred = str(self.test_incorrect_pred["predicted_vals"][i])
-            truth = str(self.test_incorrect_pred["ground_truths"][i])
+            pred = self.test_incorrect_pred["predicted_vals"][i]
+            truth = self.test_incorrect_pred["ground_truths"][i]
             if self.dataset.classes is not None:
-                pred = pred + ':' + self.dataset.classes[pred]
-                truth = truth + ':' + self.dataset.classes[truth]
-            plt.title(pred + "/" + truth)
+                pred = f'{pred}:{self.dataset.classes[pred]}'
+                truth = f'{truth}:{self.dataset.classes[truth]}'
+            plt.title(f'{pred}/{truth}')
             plt.xticks([])
             plt.yticks([])
 
