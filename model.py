@@ -1,6 +1,8 @@
 import torch.nn as nn
 import torchinfo
 
+from ghost_batch_norm import GhostBatchNorm
+
 
 class ConvLayer(nn.Module):
     def __init__(self, input_c, output_c, padding=1, bias=False, skip=False, norm_type='batch', n_groups=4, dropout=0):
@@ -27,6 +29,8 @@ class ConvLayer(nn.Module):
             return nn.GroupNorm(self.n_groups, c)
         elif self.norm_type == 'instance':
             return nn.GroupNorm(c, c)
+        elif self.norm_type == 'ghost':
+            return GhostBatchNorm(c, self.n_groups)
 
     def forward(self, x):
         x_ = x
