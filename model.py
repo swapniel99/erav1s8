@@ -8,7 +8,7 @@ from ghostbn import GhostBatchNorm
 
 
 class ConvLayer(nn.Module):
-    def __init__(self, input_c, output_c, padding=1, bias=False, skip=False, norm_type='batch', n_groups=4, dropout=0):
+    def __init__(self, input_c, output_c, padding=1, bias=False, skip=False, norm_type=None, n_groups=4, dropout=0):
         super(ConvLayer, self).__init__()
 
         # Member Variables
@@ -17,7 +17,9 @@ class ConvLayer(nn.Module):
         self.n_groups = n_groups
 
         self.convlayer = nn.Conv2d(input_c, output_c, 3, padding=padding, bias=bias, padding_mode='replicate')
-        self.normlayer = self.get_norm_layer(output_c)
+        self.normlayer = None
+        if self.norm_type is not None:
+            self.normlayer = self.get_norm_layer(output_c)
         self.actlayer = nn.ReLU()
         self.droplayer = None
         if dropout > 0:
@@ -34,11 +36,14 @@ class ConvLayer(nn.Module):
             return nn.GroupNorm(c, c)
         elif self.norm_type == 'ghost':
             return GhostBatchNorm(c, self.n_groups)
+        else:
+            raise Exception(f'Unknown norm_type: {self.norm_type}')
 
     def forward(self, x):
         x_ = x
         x = self.convlayer(x)
-        x = self.normlayer(x)
+        if self.normlayer is not None:
+            x = self.normlayer(x)
         if self.skip:
             x += x_
         x = self.actlayer(x)
@@ -48,7 +53,7 @@ class ConvLayer(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, norm_type='batch', n_groups=4, dropout=0, skip=False):
+    def __init__(self, norm_type=None, n_groups=4, dropout=0, skip=False):
         super(Model, self).__init__()
 
         # Member Variables
