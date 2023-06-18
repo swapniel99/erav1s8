@@ -134,7 +134,7 @@ class Test(object):
             image = self.test_incorrect_pred["images"][i].cpu()
             if denorm:
                 image = self.dataset.denormalise(image)
-            plt.imshow(self.dataset.show_transform(image))
+            plt.imshow(self.dataset.show_transform(image), cmap='gray')
             pred = str(self.test_incorrect_pred["predicted_vals"][i])
             truth = str(self.test_incorrect_pred["ground_truths"][i])
             if self.dataset.classes is not None:
