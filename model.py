@@ -24,14 +24,11 @@ class Model(nn.Module):
         )
 
     def get_conv_block(self, input_c, output_c, padding=1, bias=False, reps=3, padding_mode='replicate'):
-        block = [
-            nn.Conv2d(input_c, output_c, 3, padding=padding, bias=bias, padding_mode=padding_mode),
-            self.get_norm_layer(output_c),
-            nn.ReLU()
-        ]
-        for i in range(1, reps):
+        block = list()
+        for i in range(0, reps):
             block += [
-                nn.Conv2d(output_c, output_c, 3, padding=padding, bias=bias, padding_mode=padding_mode),
+                nn.Conv2d(output_c if i > 0 else input_c, output_c, 3, padding=padding, bias=bias,
+                          padding_mode=padding_mode),
                 self.get_norm_layer(output_c),
                 nn.ReLU()
             ]
