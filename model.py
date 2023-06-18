@@ -41,7 +41,7 @@ class ConvLayer(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, norm_type='batch', n_groups=4, dropout=0):
+    def __init__(self, norm_type='batch', n_groups=4, dropout=0, skip=False):
         super(Model, self).__init__()
 
         # Member Variables
@@ -50,10 +50,10 @@ class Model(nn.Module):
         self.dropout = dropout
 
         self.cblock1 = self.get_conv_block(3, 16, reps=2, padding=0, skip=False)
-        self.tblock1 = self.get_trans_block(16, 16)
-        self.cblock2 = self.get_conv_block(16, 24, reps=3, padding=1, skip=False)
-        self.tblock2 = self.get_trans_block(24, 24)
-        self.cblock3 = self.get_conv_block(24, 32, reps=3, padding=1, skip=False)
+        self.tblock1 = self.get_trans_block(16, 24)
+        self.cblock2 = self.get_conv_block(24, 24, reps=3, padding=1, skip=skip)
+        self.tblock2 = self.get_trans_block(24, 32)
+        self.cblock3 = self.get_conv_block(32, 32, reps=3, padding=1, skip=skip)
 
         self.oblock = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
