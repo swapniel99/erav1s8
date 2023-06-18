@@ -1,12 +1,11 @@
 import os
-import torch
-from torchvision import datasets, transforms
 from matplotlib import pyplot as plt
+from abc import abstractmethod
 
 
-class CIFAR10(object):
-    mean = (0.49139968, 0.48215827, 0.44653124)
-    std = (0.24703233, 0.24348505, 0.26158768)
+class DataSet(object):
+    mean = None
+    std = None
     classes = None
 
     def __init__(self, batch_size=32):
@@ -14,25 +13,13 @@ class CIFAR10(object):
         self.loader_kwargs = {'batch_size': batch_size, 'num_workers': os.cpu_count(), 'pin_memory': True}
         self.train_loader, self.test_loader = self.get_loaders()
 
+    @abstractmethod
     def get_train_loader(self):
-        train_transforms = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize(self.mean, self.std)
-        ])
-        train_data = datasets.CIFAR10('../data', train=True, download=True, transform=train_transforms)
-        if self.classes is None:
-            self.classes = {i: c for i, c in enumerate(train_data.classes)}
-        self.train_loader = torch.utils.data.DataLoader(train_data, shuffle=True, **self.loader_kwargs)
-        return self.train_loader
+        pass
 
+    @abstractmethod
     def get_test_loader(self):
-        test_transforms = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize(self.mean, self.std)
-        ])
-        test_data = datasets.CIFAR10('../data', train=False, download=True, transform=test_transforms)
-        self.test_loader = torch.utils.data.DataLoader(test_data, shuffle=True, **self.loader_kwargs)
-        return self.test_loader
+        pass
 
     def get_loaders(self):
         return self.get_train_loader(), self.get_test_loader()
@@ -42,6 +29,10 @@ class CIFAR10(object):
         for t, m, s in zip(tensor, cls.mean, cls.std):
             t.mul_(s).add_(m)
         return tensor
+
+    @abstractmethod
+    def show_transform(self, img):
+        pass
 
     def show_examples(self, figsize=None, denorm=True):
         batch_data, batch_label = next(iter(self.train_loader))
@@ -53,7 +44,7 @@ class CIFAR10(object):
             image = batch_data[i]
             if denorm:
                 image = self.denormalise(image)
-            plt.imshow(image.permute(1, 2, 0))
+            plt.imshow(self.show_transform(image), cmap='gray')
             label = batch_label[i].item()
             if self.classes is not None:
                 label = str(label) + ':' + self.classes[label]
