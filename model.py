@@ -1,8 +1,6 @@
 import torch.nn as nn
 import torchinfo
 
-from ghostbn import GhostBatchNorm
-
 
 # ****************               ASSIGNMENT 8 Models                ******************** #
 
@@ -34,8 +32,6 @@ class ConvLayer(nn.Module):
             return nn.GroupNorm(self.n_groups, c)
         elif self.norm_type == 'instance':
             return nn.GroupNorm(c, c)
-        elif self.norm_type == 'ghost':
-            return GhostBatchNorm(c, self.n_groups)
         else:
             raise Exception(f'Unknown norm_type: {self.norm_type}')
 
@@ -117,11 +113,6 @@ class LayerNormModel(Model):
 class BatchNormModel(Model):
     def __init__(self, dropout=0, skip=False):
         super(BatchNormModel, self).__init__(norm_type='batch', dropout=dropout, skip=skip)
-
-
-class GhostBatchNormModel(Model):
-    def __init__(self, dropout=0, skip=False):
-        super(GhostBatchNormModel, self).__init__(norm_type='ghost', dropout=dropout, skip=skip)
 
 
 # ****************               ASSIGNMENT 7 Models                ******************** #

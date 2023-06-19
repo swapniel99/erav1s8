@@ -12,6 +12,7 @@ class DataSet(object):
         self.batch_size = batch_size
         self.loader_kwargs = {'batch_size': batch_size, 'num_workers': os.cpu_count(), 'pin_memory': True}
         self.train_loader, self.test_loader = self.get_loaders()
+        self.example_iter = iter(self.train_loader)
 
     @abstractmethod
     def get_train_loader(self):
@@ -35,7 +36,7 @@ class DataSet(object):
         pass
 
     def show_examples(self, figsize=None, denorm=True):
-        batch_data, batch_label = next(iter(self.train_loader))
+        batch_data, batch_label = next(self.example_iter)
 
         _ = plt.figure(figsize=figsize)
         for i in range(12):
