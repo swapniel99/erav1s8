@@ -17,13 +17,13 @@ class MNIST(DataSet):
         super(MNIST, self).get_train_loader()
 
         train_data = datasets.MNIST('../data', train=True, download=True, transform=self.train_transforms)
-        self.train_loader = torch.utils.data.DataLoader(train_data, shuffle=True, **self.loader_kwargs)
+        self.train_loader = torch.utils.data.DataLoader(train_data, shuffle=self.shuffle, **self.loader_kwargs)
         return self.train_loader
 
     def get_test_loader(self):
         super(MNIST, self).get_test_loader()
         test_data = datasets.MNIST('../data', train=False, download=True, transform=self.test_transforms)
-        self.test_loader = torch.utils.data.DataLoader(test_data, shuffle=True, **self.loader_kwargs)
+        self.test_loader = torch.utils.data.DataLoader(test_data, shuffle=False, **self.loader_kwargs)
         return self.test_loader
 
     def show_transform(self, img):

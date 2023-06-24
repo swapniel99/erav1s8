@@ -21,13 +21,13 @@ class CIFAR10(DataSet):
         train_data = datasets.CIFAR10('../data', train=True, download=True, transform=self.train_transforms)
         if self.classes is None:
             self.classes = {i: c for i, c in enumerate(train_data.classes)}
-        self.train_loader = torch.utils.data.DataLoader(train_data, shuffle=True, **self.loader_kwargs)
+        self.train_loader = torch.utils.data.DataLoader(train_data, shuffle=self.shuffle, **self.loader_kwargs)
         return self.train_loader
 
     def get_test_loader(self):
         super(CIFAR10, self).get_test_loader()
         test_data = datasets.CIFAR10('../data', train=False, download=True, transform=self.test_transforms)
-        self.test_loader = torch.utils.data.DataLoader(test_data, shuffle=True, **self.loader_kwargs)
+        self.test_loader = torch.utils.data.DataLoader(test_data, shuffle=False, **self.loader_kwargs)
         return self.test_loader
 
     def show_transform(self, img):

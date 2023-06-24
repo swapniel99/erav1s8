@@ -9,14 +9,15 @@ class DataSet(object):
     std = None
     classes = None
 
-    def __init__(self, batch_size=32, augment_transforms=None):
+    def __init__(self, batch_size=32, augment_transforms=None, shuffle=True):
         self.batch_size = batch_size
+        self.augment_transforms = augment_transforms
+        self.shuffle = shuffle
         self.loader_kwargs = {'batch_size': batch_size, 'num_workers': os.cpu_count(), 'pin_memory': True}
         self.std_transforms = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize(self.mean, self.std)
         ])
-        self.augment_transforms = augment_transforms
         self.train_transforms = self.std_transforms
         self.test_transforms = self.std_transforms
         self.train_loader, self.test_loader = self.get_loaders()
