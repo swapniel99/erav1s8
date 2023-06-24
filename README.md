@@ -10,7 +10,7 @@ We have two datasets currently in the modeule MNIST and CIFAR10 but can easily b
 ![CIFAR10 Examples](assets/cifar_examples.png)
 
 ### 2. model.py Module
-This file contains various models we have tried over CIFAR10 dataset and also previous MNIST models from assignment 7. The CIFAR10 Models are implemented using residual connections.
+This file contains various models we have tried over CIFAR10 dataset and also previous MNIST models from session 7. The CIFAR10 Models are implemented using residual connections.
 
 The ConvLayer class implements a small building block which is as follows:
 ```bazaar
@@ -83,7 +83,7 @@ Train and Test classes perform training and testing respectively on given model 
 ### 4. utils.py Modele
 This module contains miscellaneous functions like detecting device and setting random seed.
 
-## The Assignment Results
+## The Results
 
 ### 1. Group Normalisation
 Best Train Accuracy: 70.81%
