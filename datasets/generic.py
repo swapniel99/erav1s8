@@ -16,16 +16,17 @@ class DataSet(object):
             transforms.ToTensor(),
             transforms.Normalize(self.mean, self.std)
         ])
+        self.augment_transforms = None
         self.train_transforms = self.std_transforms
         self.test_transforms = self.std_transforms
         self.train_loader, self.test_loader = self.get_loaders()
         self.example_iter = iter(self.train_loader)
 
     @abstractmethod
-    def get_train_loader(self, augment_transforms=None):
+    def get_train_loader(self):
         all_transforms = list()
-        if augment_transforms is not None:
-            all_transforms.append(augment_transforms)
+        if self.augment_transforms is not None:
+            all_transforms.append(self.augment_transforms)
         all_transforms.append(self.std_transforms)
         self.train_transforms = transforms.Compose(all_transforms)
 

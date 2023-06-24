@@ -9,14 +9,14 @@ class CIFAR10(DataSet):
     std = (0.24703233, 0.24348505, 0.26158768)
     classes = None
 
-    def get_train_loader(self, augment_transforms=None):
-        augment_transforms = augment_transforms or transforms.Compose([
+    def get_train_loader(self):
+        self.augment_transforms = self.augment_transforms or transforms.Compose([
             transforms.RandomHorizontalFlip(0.5),
             transforms.RandomGrayscale(0.1),
             transforms.RandomRotation((-7.0, 7.0)),
             transforms.RandomPerspective(0.3, 0.5)
         ])
-        super(CIFAR10, self).get_train_loader(augment_transforms)
+        super(CIFAR10, self).get_train_loader()
 
         train_data = datasets.CIFAR10('../data', train=True, download=True, transform=self.train_transforms)
         if self.classes is None:
