@@ -1,5 +1,6 @@
 import os
 from matplotlib import pyplot as plt
+from torchvision import transforms
 from abc import abstractmethod
 
 
@@ -8,15 +9,26 @@ class DataSet(object):
     std = None
     classes = None
 
-    def __init__(self, batch_size=32):
+    def __init__(self, batch_size=32, augment_transforms=None):
         self.batch_size = batch_size
         self.loader_kwargs = {'batch_size': batch_size, 'num_workers': os.cpu_count(), 'pin_memory': True}
+        self.std_transforms = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(self.mean, self.std)
+        ])
+        self.augment_transforms = augment_transforms
+        self.train_transforms = self.std_transforms
+        self.test_transforms = self.std_transforms
         self.train_loader, self.test_loader = self.get_loaders()
         self.example_iter = iter(self.train_loader)
 
     @abstractmethod
     def get_train_loader(self):
-        pass
+        all_transforms = list()
+        if self.augment_transforms is not None:
+            all_transforms.append(self.augment_transforms)
+        all_transforms.append(self.std_transforms)
+        self.train_transforms = transforms.Compose(all_transforms)
 
     @abstractmethod
     def get_test_loader(self):
