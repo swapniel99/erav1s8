@@ -13,7 +13,7 @@ class CIFAR10(DataSet):
         self.augment_transforms = self.augment_transforms or transforms.Compose([
             transforms.RandomHorizontalFlip(0.5),
             transforms.RandomGrayscale(0.1),
-            transforms.RandomRotation((-7.0, 7.0)),
+            transforms.RandomRotation(7),
             transforms.RandomPerspective(0.3, 0.5)
         ])
         super(CIFAR10, self).get_train_loader()

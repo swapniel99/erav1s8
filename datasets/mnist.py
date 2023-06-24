@@ -11,8 +11,8 @@ class MNIST(DataSet):
 
     def get_train_loader(self):
         self.augment_transforms = self.augment_transforms or transforms.Compose([
-            transforms.RandomRotation((-7.0, 7.0), fill=(0,)),
-            transforms.RandomPerspective(0.3, 0.5, fill=(0,))
+            transforms.RandomRotation(7),
+            transforms.RandomPerspective(0.3, 0.5)
         ])
         super(MNIST, self).get_train_loader()
 
